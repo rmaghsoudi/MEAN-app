@@ -47,7 +47,13 @@ app.get('/api/posts', (req, res, next) => {
         posts: documents
       });
     });
-
+});
+// the wildcard is called a dynamic path segment ":"
+app.delete('/api/posts/:id', (req, res, next) => {
+  Post.deleteOne({ _id: req.params.id }).then(result => {
+    console.log(result);
+    res.status(200).json({ message: "Post Deleted!"});
+  })
 });
 
 module.exports = app;
