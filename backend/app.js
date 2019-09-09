@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -16,6 +17,9 @@ mongoose.connect("mongodb+srv://romy:kWqc6ftWcBx3kv3v@cluster0-iq6jj.mongodb.net
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+// make the images folder statically accessible by using the express static middleware
+// using the path import, any requests to images will be forwarded to the correct folder
+app.use("/images", express.static(path.join("backend/images")));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

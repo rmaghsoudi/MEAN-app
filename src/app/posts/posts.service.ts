@@ -21,7 +21,8 @@ export class PostsService {
       return {
         title: post.title,
         content: post.content,
-        id: post._id
+        id: post._id,
+        imagePath: post.imagePath
       };
     });
   }))
@@ -35,18 +36,29 @@ export class PostsService {
    return this.postsUpdated.asObservable();
  }
 
- getPost(id) {
-   return this.http.get<{_id: string, title: string, content: string}>(
+ getPost(id: string) {
+   return this.http.get<{_id: string, title: string, content: string, imagePath: string}>(
      `http://localhost:3000/api/posts/${id}`
      );
  }
 
- addPost(title: string, content: string) {
-  const post: Post = {id: null, title, content};
-  this.http.post<{message: string, postId: string }>('http://localhost:3000/api/posts', post)
+ addPost(title: string, content: string, image: File) {
+  const postData = new FormData();
+  postData.append('title', title);
+  postData.append('content', content);
+  postData.append('image', image, title);
+
+  this.http
+    .post<{message: string, post: Post }>(
+      'http://localhost:3000/api/posts',
+      postData
+      )
   .subscribe((res) => {
-    const id = res.postId;
-    post.id = id;
+    const post: Post = {
+      id: res.post.id,
+      title, content,
+      imagePath: res.post.imagePath
+      };
     this.posts.push(post);
     this.postsUpdated.next([...this.posts]);
     this.router.navigate(['/']);
@@ -54,13 +66,32 @@ export class PostsService {
 
  }
 
- updatePost(id: string, title: string, content: string) {
-   const post: Post = { id, title, content };
-   this.http.patch(`http://localhost:3000/api/posts/${id}`, post)
+ updatePost(id: string, title: string, content: string, image: File | string) {
+   let postData: Post | FormData;
+   if (typeof(image) === 'object') {
+    postData = new FormData();
+    // set up a worker process that would check which files aren't referenced in your db then deletes the files
+    // IF you want to get rid of files/prevent a ton of files
+    postData.append('id', id);
+    postData.append('title', title);
+    postData.append('content', content);
+    postData.append('image', image, title);
+
+   } else {
+    postData = {id, title, content, imagePath: image};
+   }
+   this.http
+   .patch(`http://localhost:3000/api/posts/${id}`, postData)
     .subscribe(response => {
       // updating the post on the frontend right after updating
       const updatedPosts = [...this.posts];
-      const oldPostIndex = updatedPosts.findIndex(p => p.id === post.id);
+      const oldPostIndex = updatedPosts.findIndex(p => p.id === id);
+      const post: Post = {
+        id,
+        title,
+        content,
+        imagePath: ''
+      };
       updatedPosts[oldPostIndex] = post;
       this.posts = updatedPosts;
       this.postsUpdated.next([...this.posts]);
