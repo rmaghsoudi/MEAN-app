@@ -51,24 +51,26 @@ router.post('', multer({storage}).single('image'), (req, res, next) => {
 });
 
 router.get('', (req, res, next) => {
-  // implementing pagination by accessing query params, are strings by default
-  // the + is a shorthand for converting strings to numbers
-  const pageSize = +req.query.pageSize;
+  // + is a shorthand for converting strings to numbers
+  const pageSize = +req.query.pagesize;
   const currentPage = +req.query.page;
   const postQuery = Post.find();
-  // fetches a slice of posts
+  let fetchedPosts;
   if (pageSize && currentPage) {
-    postQuery
-    // defines how many posts should be skipped per query, skips the other pages
-      .skip(pageSize * (currentPage - 1))
-      .limit(pageSize);
+    // determines how many documents should be skipped
+    postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
   }
-  // fetches all the posts based off of our modified query
-  postQuery.find()
+  // queries based on the new "skipped" value
+  postQuery
     .then(documents => {
+      fetchedPosts = documents;
+      return Post.countDocuments();
+    })
+    .then(count => {
       res.status(200).json({
-        message: 'Posts Fetched Successfully!',
-        posts: documents
+        message: "Posts fetched successfully!",
+        posts: fetchedPosts,
+        maxPosts: count
       });
     });
 });
