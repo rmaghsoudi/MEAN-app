@@ -9,6 +9,10 @@ a {
   color: aliceblue;
 }
 
+ul {
+  display: flex;
+}
+
 /* toolbar uses flexbox by default, makes sure it takes all available space */
 .spacer {
   flex: 1 1 auto;
