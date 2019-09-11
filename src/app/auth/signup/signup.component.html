@@ -1,6 +1,6 @@
 <mat-card>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
-  <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
+  <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
      <!-- elvis ? operator that checks if it exists first before accessing post.title -->
     <mat-form-field>
       <input
@@ -28,7 +28,7 @@
     <button
       mat-raised-button
       color="accent"
-      type="submit">Login
+      type="submit">Sign Up
     </button>
   </form>
 </mat-card>

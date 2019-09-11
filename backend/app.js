@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const postsRoutes = require("./routes/posts");
+const userRoutes = require("./routes/user");
 
 const app = express();
 //returns a promise, hence we can use the .thens, you should account for the failures, the "test" is the db name
@@ -34,5 +35,6 @@ app.use((req, res, next) => {
 
 // defining the route that'll use your imported routes
 app.use("/api/posts", postsRoutes);
+app.use("/api/user", userRoutes);
 
 module.exports = app;
