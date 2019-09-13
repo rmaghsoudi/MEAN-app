@@ -6,7 +6,9 @@ module.exports = (req, res, next) => {
 // auth header will have "Bearer: tokenstuff" by convention, hence the split
   try {
     const token = req.headers.authorization.split(' ')[1];
-    jwt.verify(token, 'this_secret_should_be_longer');
+    const decodedToken = jwt.verify(token, 'this_secret_should_be_longer');
+    // every middleware running after this one will have access to this newly created data field
+    req.userData = { email: decodedToken.email, userId: decodedToken.userId };
     // lets the request travel on after token verification
     next();
   } catch (error) {

@@ -34,7 +34,8 @@ router.post('', checkAuth, multer({storage}).single('image'), (req, res, next) =
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    imagePath: `${url}/images/${req.file.filename}`
+    imagePath: `${url}/images/${req.file.filename}`,
+    creator: req.userData.userId
   });
   post.save().then(result => {
     res.status(201).json({
@@ -104,15 +105,24 @@ router.patch(
     imagePath
   });
   //updateOne takes 2 arguments, the id of the element and the new object you want to store
-  Post.updateOne({ _id: req.params.id}, post).then(result => {
-    res.status(200).json({ message: "Update Successful!"});
+  Post.updateOne({ _id: req.params.id, creator: req.userData.userId }, post).then(result => {
+  // check if user is authorized and send message based off of result
+    if (result.nModified > 0) {
+      res.status(200).json({ message: "Update Successful!"});
+    } else {
+      res.status(401).json({ message: "Not Authorized"});
+    }
   });
 });
 
 // the wildcard is called a dynamic path segment ":"
 router.delete('/:id', checkAuth, (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id }).then(result => {
-    res.status(200).json({ message: "Post Deleted!"});
+  Post.deleteOne({ _id: req.params.id, creator: req.userData.userId }).then(result => {
+    if (result.n > 0) {
+      res.status(200).json({ message: "Post Deleted!"});
+    } else {
+      res.status(401).json({ message: "Not Authorized"});
+    }
   })
 });
 
