@@ -102,7 +102,8 @@ router.patch(
     _id: req.body.id,
     title: req.body.title,
     content: req.body.content,
-    imagePath
+    imagePath,
+    creator: req.userData.userId
   });
   //updateOne takes 2 arguments, the id of the element and the new object you want to store
   Post.updateOne({ _id: req.params.id, creator: req.userData.userId }, post).then(result => {
