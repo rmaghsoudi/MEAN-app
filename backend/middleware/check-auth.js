@@ -12,6 +12,6 @@ module.exports = (req, res, next) => {
     // lets the request travel on after token verification
     next();
   } catch (error) {
-    res.status(401).json({ message: "Auth Failed" });
+    res.status(401).json({ message: "You are not authenticated." });
   }
 };
